@@ -1,13 +1,17 @@
 'use strict';
-const fs = require('fs');
-const bencode = require('bencode');
 
-const tracker = require('./tracker');
-const torrentParser = require('./torrent-parser');
+const download = require('./src/download');
+const torrentParser = require('./src/torrent-parser');
 
-const torrent = torrentParser.open('./hellhigh.torrent');
+let torrent = null;
 
-tracker.getPeers(torrent, (peers)=>{
-    console.log(peers);
-})
+if(process.argv[2]){
+    torrent = torrentParser.open(process.argv[2]);
+}
+else{
+    console.log('no torrent file specified');
+    return;
+}
+
+download(torrent);
 

@@ -86,9 +86,6 @@ function buildAnnounceReq(connId, torrent, port=6881){
     // port
     buf.writeUInt16BE(port, 96);
 
-
-    // console.log(buf);
-
     return buf;
 }
 
@@ -124,9 +121,7 @@ function parseAnnounceResp(response){
     }
 }
 function respType(response){
-    if(response.readUInt32BE(0) === 0){
-        return 'connect';
-    }else if(response.readUInt32BE(0) === 1){
-        return 'announce';
-    }
+    const action = response.readUInt32BE(0);
+    if(action === 0) return 'connect';
+    if(action === 1) return 'announce';
 }
