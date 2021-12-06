@@ -5,39 +5,56 @@ const crypto = require('crypto');
 
 const torrentParser = require('./torrent-parser');
 const util = require('./util');
+const logging = require('./log');
+
+const location = 'tracker.js';
 
 module.exports.getPeers = (torrent, callback)=>{
+
+    // Types of Tracker requests : 
+    // 1] Connection req
+    // 2] Announce req
+
     const socket = dgram.createSocket('udp4');
     const url  = urlParse(torrent.announce.toString('utf8'));
-
     
+    // TODO: connect and get peers from all trackers in torrent['announce-list'][0]
+    // TODO: keep track of when a tracker was pinged last, and ping it again only after delay defined in protocol
+    // TODO: keep track of a global peer pool 
+
     // 1. send connect request
-    udpSend(socket, buildConnReq(), url)
+    const connRequest = buildConnReq();
+    udpSend(socket, connRequest, url)
+    logging.info(location, `sending connection request to tracker `)
+    logging.info(location, url)
+    logging.info(location, connRequest)
 
     socket.on('message', response =>{
-        // console.log(response);
+        // the message from tracker can be either 'connect' response or 'announce' response
         if(respType(response) === 'connect'){
-            
             // 2. receive and parse connection id
             const connResp = parseConnResp(response);
-            console.log(connResp);
+            logging.info(location, 'received connection response from tracker : ');
+            logging.info(location, connResp);
             // 3. send announce request 
             const announceReq = buildAnnounceReq(connResp.connectionId, torrent);
             udpSend(socket, announceReq, url);
-        } else if( respType(response) === 'announce'){
+            logging.info(location, 'sending announce request to tracker : ')
+            logging.info(location, connRequest)
+        } else if(respType(response) === 'announce'){
             // 4. parse announce response 
             const announceResp = parseAnnounceResp(response);
-            console.log(announceResp);
+            logging.info(location, 'received connection response from tracker : ');
+            logging.info(location, announceResp);
             // 5. pass peers to callback
             callback(announceResp.peers);
         }
-
     });
+
     socket.on('error', err=>{ console.error(err)})
 }
 
 function udpSend(socket, message, rawUrl, callback=()=>{}){
-    
     const url = urlParse(rawUrl);
     socket.send(message, 0, message.length, url.port, url.hostname, callback);
 }
@@ -96,6 +113,7 @@ function parseConnResp(response){
         connectionId: response.slice(8)
     }
 }
+
 function parseAnnounceResp(response){
 
     function groups(iterable, groupSize) {
@@ -120,6 +138,7 @@ function parseAnnounceResp(response){
         })
     }
 }
+
 function respType(response){
     const action = response.readUInt32BE(0);
     if(action === 0) return 'connect';

@@ -5,9 +5,7 @@ const crypto = require('crypto');
 const bignum = require('bignum');
 
 module.exports.infoHash = (torrent) => {
-    // console.log(torrent.info)
     const info = bencode.encode(torrent.info);
-    
     return crypto.createHash('sha1').update(info).digest();
 };
 module.exports.size = (torrent) => {

@@ -1,12 +1,14 @@
+const location = 'download.js'
 const tracker = require('./tracker');
 const net = require('net');
+const logging = require('./log');
 
 module.exports = (torrent) =>{
     tracker.getPeers(torrent, (peers)=>{
-        console.log(peers);
-        // peers.forEach(download);
-        console.log('Downloading from .. ');
-        console.log(peers[5]);
+        logging.info(location, 'list of peers from tracker');
+        logging.info(location, peers);
+        // TODO: download from multiple 
+        logging.info(`connecting to peer : ${peers[5]}`);
         download(peers[5]);
     })
 }

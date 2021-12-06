@@ -1,10 +1,14 @@
 'use strict';
 
+// TODO : write flow 
+// TODO : code all different types of requests & responses 
+const location = 'messages.js'
 const Buffer = require('buffer').Buffer;
 const torrentParser = require('./torrent-parser');
 const util = require('./util');
 const { builtinModules } = require('module');
 
+// 
 
 module.exports.buildHandshake = (torrent)=> {
     // handshake: 
@@ -29,7 +33,9 @@ module.exports.buildHandshake = (torrent)=> {
     buf.write(util.genId());
     return buf;  
 }
+
 module.exports.buildKeepAlive = ()=> Buffer.alloc(4);
+
 module.exports.buildChoke = ()=> {
     // message type 0
     const buf = Buffer.alloc(5);
@@ -39,6 +45,7 @@ module.exports.buildChoke = ()=> {
     buf.writeUInt8(0,4);
     return buf;
 }
+
 module.exports.buildUnchoke = ()=> {
     // message type 1
     const buf = Buffer.alloc(5);
@@ -48,6 +55,7 @@ module.exports.buildUnchoke = ()=> {
     buf.writeUInt8(1,4);
     return buf;
 }
+
 module.exports.buildInterested = ()=> {
     // message type 2
     const buf = Buffer.alloc(5);
@@ -57,6 +65,7 @@ module.exports.buildInterested = ()=> {
     buf.writeUInt8(2,4);
     return buf;
 }
+
 module.exports.buildUninterested = ()=> {
     // message type 3
     const buf = Buffer.alloc(5);
@@ -66,6 +75,7 @@ module.exports.buildUninterested = ()=> {
     buf.writeUInt8(3,4);
     return buf;
 }
+
 module.exports.buildHave = (payload)=> {
     // message type 4
     const buf = Buffer.alloc(9);
@@ -77,6 +87,7 @@ module.exports.buildHave = (payload)=> {
     buf.writeUInt32BE(payload, 5);
     return buf;
 }
+
 module.exports.buildBitField = (bitfield)=> {
     // message type 5
     const buf = Buffer.alloc(bitfield.length + 1 + 4);
@@ -88,6 +99,7 @@ module.exports.buildBitField = (bitfield)=> {
     bitfield.copy(buf,5);
     return buf;
 }
+
 module.exports.buildRequest = (payload)=> {
     // message type 6
     const buf = Buffer.alloc(17);
@@ -105,6 +117,7 @@ module.exports.buildRequest = (payload)=> {
     return buf;
     
 }
+
 module.exports.buildPiece = (payload)=> {
     // message type 7
     const buf = Buffer.alloc(payload.block.length + 8 + 1 + 4);
@@ -121,6 +134,7 @@ module.exports.buildPiece = (payload)=> {
     payload.block.copy(buf,13);
     return buf;
 }
+
 module.exports.buildCancel = (payload)=> {
     // message type 8
     const buf = Buffer.alloc(12 + 1 + 4);
@@ -137,6 +151,7 @@ module.exports.buildCancel = (payload)=> {
     buf.writeUInt32BE(payload.length, 13);
     return buf;
 }
+
 module.exports.buildPort = (port)=> {
     // message type 9
     const buf = Buffer.alloc(2 + 1 + 4 );
